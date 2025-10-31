@@ -52,8 +52,7 @@ def get_option_chain(ticker: str, expiry: str):
         return pd.DataFrame(), pd.DataFrame()
 
 
-def get_option_chains_all(ticker: str,
-                          max_workers: int = 8) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def get_option_chains_all(ticker: str, max_workers: int = 8) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Fetches option chains (calls and puts) for every available expiry of a given ticker,
     performing API requests in parallel to reduce total fetch time.

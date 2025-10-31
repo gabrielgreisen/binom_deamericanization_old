@@ -41,7 +41,8 @@ def prepare_dataset(ticker: str, max_workers: int = 8) -> pd.DataFrame:
 
     df['mid_price'] = df.apply(compute_mid, axis=1)
     df['moneyness'] = df['underlying_price'] / df['strike']
-    df['log_moneyness'] = np.log(df['underlying_price'] / df['strike'].replace(0, np.nan))
+    df['log_moneyness'] = np.log(
+        df['underlying_price'] / df['strike'].replace(0, np.nan))
     df['intrinsic'] = df.apply(
         lambda r: max(r['underlying_price'] - r['strike'], 0.0)
         if r['option_type'] == 'call'
@@ -51,7 +52,8 @@ def prepare_dataset(ticker: str, max_workers: int = 8) -> pd.DataFrame:
     df['time_value'] = df['mid_price'] - df['intrinsic']
 
     if 'impliedVolatility' not in df.columns:
-        raise RuntimeError("yfinance did not return impliedVolatility column for this ticker/expiry set.")
+        raise RuntimeError(
+            "yfinance did not return impliedVolatility column for this ticker/expiry set.")
     df['implied_vol'] = pd.to_numeric(df['impliedVolatility'], errors='coerce')
 
     cols_keep = [
@@ -103,7 +105,8 @@ def train_xgb(df: pd.DataFrame, test_size: float = 0.2, random_state: int = 42):
     mae = mean_absolute_error(y_test, y_pred)
     rmse = math.sqrt(mean_squared_error(y_test, y_pred))
 
-    importances = sorted(zip(features, model.feature_importances_), key=lambda x: x[1], reverse=True)
+    importances = sorted(
+        zip(features, model.feature_importances_), key=lambda x: x[1], reverse=True)
     metrics = {
         'mae': mae,
         'rmse': rmse,

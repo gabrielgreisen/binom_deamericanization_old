@@ -7,7 +7,7 @@ class TransformerRegressor(nn.Module):
         super().__init__()
         self.input_linear = nn.Linear(input_dim, d_model)
         encoder_layer = nn.TransformerEncoderLayer(
-            d_model, nhead, 128, dropout, batch_first=True  # ✅ fix
+            d_model, nhead, 128, dropout, batch_first=True
         )
         self.transformer = nn.TransformerEncoder(encoder_layer, num_layers)
         self.fc_out = nn.Linear(d_model, 1)
