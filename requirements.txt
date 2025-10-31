@@ -4,4 +4,4 @@ scikit-learn>=1.4.0
 xgboost>=2.0.0
 yfinance>=0.2.44
 matplotlib>=3.8.0
-torch>=2.9.9
+torch>=2.9.0
