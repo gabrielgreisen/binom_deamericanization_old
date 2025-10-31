@@ -6,8 +6,7 @@ import pandas as pd
 import numpy as np
 from yfin import get_option_chains_all
 from transformer_1 import TransformerRegressor
-from random_forest_1 import prepare_dataset  # stealing features
-
+from xgboost_1 import prepare_dataset  # stealing features
 
 df = prepare_dataset("AAPL")
 
