@@ -4,8 +4,8 @@ from datetime import datetime
 from typing import List, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-def get_option_chain(ticker: str, expiry: str):
 
+def get_option_chain(ticker: str, expiry: str):
     """
     Fetches the option chain (calls and puts) for a given stock ticker and expiry date.
 
@@ -21,12 +21,13 @@ def get_option_chain(ticker: str, expiry: str):
     tuple[pd.DataFrame, pd.DataFrame]
         Calls DataFrame, Puts DataFrame
     """
-    
+
     try:
         stock = yf.Ticker(ticker)
 
         if expiry not in stock.options:
-            raise ValueError(f"Expiration `{expiry}` cannot be found. Available expirations are: {stock.options}")
+            raise ValueError(
+                f"Expiration `{expiry}` cannot be found. Available expirations are: {stock.options}")
 
         option_chain = stock.option_chain(expiry)
         calls = option_chain.calls.copy()
@@ -44,14 +45,15 @@ def get_option_chain(ticker: str, expiry: str):
         calls['TTM'] = ttm
         puts['TTM'] = ttm
 
-
         return calls, puts
     except Exception as e:
         print(f"Error fetching option chain for {ticker} on {expiry}: {e}")
-        return pd.DataFrame(), pd.DataFrame() # Return two empty frames so pipeline doesn't break
+        # Return two empty frames so pipeline doesn't break
+        return pd.DataFrame(), pd.DataFrame()
+
 
 def get_option_chains_all(ticker: str,
-                                  max_workers: int = 8) -> Tuple[pd.DataFrame, pd.DataFrame]:
+                          max_workers: int = 8) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Fetches option chains (calls and puts) for every available expiry of a given ticker,
     performing API requests in parallel to reduce total fetch time.
@@ -77,29 +79,29 @@ def get_option_chains_all(ticker: str,
     today = datetime.today().date()
 
     calls_accum = []
-    puts_accum  = []
+    puts_accum = []
 
     def fetch_chain(expiry: str):
         """Fetch calls/puts for a single expiry and return (expiry, calls_df, puts_df)."""
         try:
             chain = stock.option_chain(expiry)
             calls = chain.calls.copy()
-            puts  = chain.puts.copy()
+            puts = chain.puts.copy()
         except Exception as e:
             # Return None on error so we can skip later
             return expiry, None, None
 
         # Tag each row with type and expiration
-        calls['option_type']  = 'call'
-        puts ['option_type']  = 'put'
-        calls['expiration']   = expiry
-        puts ['expiration']   = expiry
+        calls['option_type'] = 'call'
+        puts['option_type'] = 'put'
+        calls['expiration'] = expiry
+        puts['expiration'] = expiry
 
         # Compute time-to-maturity once
         exp_date = datetime.strptime(expiry, "%Y-%m-%d").date()
         ttm = max((exp_date - today).days / 365.0, 0.0)
         calls['TTM'] = ttm
-        puts ['TTM'] = ttm
+        puts['TTM'] = ttm
 
         return expiry, calls, puts
 
@@ -110,11 +112,13 @@ def get_option_chains_all(ticker: str,
             expiry, calls_df, puts_df = future.result()
             if calls_df is not None and not calls_df.empty:
                 calls_accum.append(calls_df)
-            if puts_df  is not None and not puts_df.empty:
+            if puts_df is not None and not puts_df.empty:
                 puts_accum.append(puts_df)
 
     # Concatenate results
-    all_calls = pd.concat(calls_accum, ignore_index=True) if calls_accum else pd.DataFrame()
-    all_puts  = pd.concat(puts_accum,  ignore_index=True) if puts_accum  else pd.DataFrame()
+    all_calls = pd.concat(
+        calls_accum, ignore_index=True) if calls_accum else pd.DataFrame()
+    all_puts = pd.concat(
+        puts_accum,  ignore_index=True) if puts_accum else pd.DataFrame()
 
     return all_calls, all_puts
