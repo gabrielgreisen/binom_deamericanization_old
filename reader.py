@@ -7,12 +7,5 @@ def read_chain():
     return df
 
 
-def read_yfin():
-    df = yf.get_option_chains_all("AAPL")
-    return df
-
-
-calls, puts = read_yfin()
-df = calls
-
-print(df.columns)
+df = read_chain()
+print(df)
