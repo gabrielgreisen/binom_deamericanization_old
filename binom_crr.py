@@ -1,6 +1,6 @@
 import math
 
-def binomial_crr(Option: str, K: int, T: int, S_0: float, sigma: float, r: float, q: float, N: float, Exercise: str):
+def binomial_crr(Option: str, K: int, T: int, S_0: float, sigma: float, r: float, q: float, N: int, Exercise: str):
     
     """
     Approximates the price of an option using the Cox-Ross-Rubinstein model
@@ -21,6 +21,8 @@ def binomial_crr(Option: str, K: int, T: int, S_0: float, sigma: float, r: float
         Continuous compounding risk free interest rate
     q: float
         Continuous dividend yield
+    N: int
+        Number of time steps
     Exercise: str
         "A" for American options and "E" for European options
     """
